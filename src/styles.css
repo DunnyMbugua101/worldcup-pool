@@ -88,11 +88,34 @@ button { font-family: var(--font-body); cursor: pointer; }
 .hint { font-size: 0.8rem; color: var(--muted); margin: 0.9rem 0 0; }
 .error { background: #3a1a16; color: #ffb4a3; padding: 0.6rem 0.8rem;
   border-radius: 10px; font-size: 0.85rem; margin-bottom: 0.8rem; }
+.info { background: rgba(47, 174, 91, 0.18); color: #b9f3cd; padding: 0.6rem 0.8rem;
+  border-radius: 10px; font-size: 0.85rem; margin-bottom: 0.8rem; }
+.field span em { font-style: normal; color: var(--muted); opacity: 0.8; font-size: 0.78rem; }
+.linkbtn { background: none; border: 0; color: var(--gold); font-weight: 700;
+  padding: 0; text-decoration: underline; font-size: inherit; }
+.chip.pending { color: var(--text); background: rgba(150, 180, 240, 0.18); }
 
 /* ---- shell ---- */
 .app { max-width: 720px; margin: 0 auto; padding: 0 1rem 4rem; }
-.credit-tl { font-size: 0.62rem; letter-spacing: 0.08em; color: var(--gold);
-  opacity: 0.8; padding-top: 0.6rem; }
+.toprow { display: flex; flex-direction: column; align-items: flex-start; gap: 0.4rem; padding-top: 0.6rem; }
+.credit-tl { font-size: 0.62rem; letter-spacing: 0.08em; color: var(--gold); opacity: 0.75; order: -1; }
+.help-btn { background: var(--gold); color: #06122c; border: 0; font-weight: 700;
+  font-size: 0.72rem; padding: 0.32rem 0.7rem; border-radius: 999px; }
+
+/* ---- help / rules page ---- */
+.help { padding-bottom: 2rem; }
+.help h1 { font-size: 2rem; margin: 0.5rem 0 0.2rem; }
+.help .h2 { font-size: 1.15rem; margin: 1.4rem 0 0.4rem; }
+.help p { line-height: 1.55; }
+.help ul { line-height: 1.65; padding-left: 1.1rem; }
+.help b { color: var(--text); }
+.back { background: transparent; border: 1px solid var(--line); color: var(--text);
+  padding: 0.45rem 0.8rem; border-radius: 9px; font-weight: 600; margin: 0.2rem 0 0.6rem; }
+.rules { width: 100%; border-collapse: collapse; background: var(--panel);
+  border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin: 0.5rem 0; backdrop-filter: blur(3px); }
+.rules td { padding: 0.6rem 1rem; border-top: 1px solid var(--line); }
+.rules tr:first-child td { border-top: 0; }
+.rules td:last-child { text-align: right; font-weight: 800; color: var(--gold); }
 .topbar { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.2rem 1rem; }
 .brand { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; }
 .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%;
