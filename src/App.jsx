@@ -404,14 +404,18 @@ function Leaderboard({ meName }) {
     <table className="board">
       <thead><tr><th>#</th><th>Player</th><th>Correct</th><th>Points</th></tr></thead>
       <tbody>
-        {rows.map((r, i) => (
-          <tr key={r.display_name} className={cleanName(r.display_name) === cleanName(meName) ? "me" : ""}>
-            <td className="rank">{i + 1}</td>
-            <td>{cleanName(r.display_name)}</td>
-            <td>{r.correct}</td>
-            <td className="pts">{r.points}</td>
-          </tr>
-        ))}
+        {rows.map((r) => {
+          // Dense ranking: same points share a number, next score is the next number (1,1,2).
+          const rank = [...new Set(rows.map((x) => x.points))].indexOf(r.points) + 1;
+          return (
+            <tr key={r.display_name} className={cleanName(r.display_name) === cleanName(meName) ? "me" : ""}>
+              <td className="rank">{rank}</td>
+              <td>{cleanName(r.display_name)}</td>
+              <td>{r.correct}</td>
+              <td className="pts">{r.points}</td>
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );
@@ -540,4 +544,3 @@ export default function App() {
 
   return content;
 }
-//current state
