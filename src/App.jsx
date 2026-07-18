@@ -269,7 +269,8 @@ function Predict({ session }) {
           <span className="lock is-open">Locks {fmtDate(current.lock_at)}</span>
         </header>
         <p className="muted small">
-          Make your picks before this round locks. The next round opens here automatically once it closes.
+           No more second chances. One game, one call, one shot at glory.
+           Pick your moment, trust your gut, and back it.
         </p>
         {fxs.map((fx) => (
           <FixtureRow key={fx.id} fx={fx} locked={false} pick={picks[fx.id]} onPick={savePick} />
