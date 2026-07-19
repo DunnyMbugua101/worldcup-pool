@@ -741,7 +741,7 @@ export default function App() {
           <button className={tab === "results" ? "on" : ""} onClick={() => setTab("results")}>Results</button>
           <button className={tab === "board" ? "on" : ""} onClick={() => setTab("board")}>Leaderboard</button>
           <button className={tab === "winners" ? "on" : ""} onClick={() => setTab("winners")}>Winner</button>
-          <button className={tab === "reviews" ? "on" : ""} onClick={() => setTab("reviews")}>Review</button>
+          <button className={tab === "reviews" ? "on" : ""} onClick={() => setTab("reviews")}>Wrapped</button>
         </nav>
 
         <main className="content">
