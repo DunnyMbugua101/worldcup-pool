@@ -79,6 +79,7 @@ button { font-family: var(--font-body); cursor: pointer; }
 .tab.on { background: var(--blue); color: #fff; }
 .field { display: block; margin-bottom: 0.9rem; }
 .field span { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 0.35rem; }
+.field span em { font-style: normal; color: var(--muted); opacity: 0.8; font-size: 0.78rem; }
 .field input { width: 100%; padding: 0.8rem 0.9rem; border-radius: 11px; font-size: 1rem;
   background: rgba(8, 20, 48, 0.7); border: 1px solid var(--line); color: var(--text); }
 .field input:focus { outline: 2px solid var(--blue); border-color: transparent; }
@@ -90,10 +91,8 @@ button { font-family: var(--font-body); cursor: pointer; }
   border-radius: 10px; font-size: 0.85rem; margin-bottom: 0.8rem; }
 .info { background: rgba(47, 174, 91, 0.18); color: #b9f3cd; padding: 0.6rem 0.8rem;
   border-radius: 10px; font-size: 0.85rem; margin-bottom: 0.8rem; }
-.field span em { font-style: normal; color: var(--muted); opacity: 0.8; font-size: 0.78rem; }
 .linkbtn { background: none; border: 0; color: var(--gold); font-weight: 700;
   padding: 0; text-decoration: underline; font-size: inherit; }
-.chip.pending { color: var(--text); background: rgba(150, 180, 240, 0.18); }
 
 /* ---- shell ---- */
 .app { max-width: 720px; margin: 0 auto; padding: 0 1rem 4rem; }
@@ -101,21 +100,6 @@ button { font-family: var(--font-body); cursor: pointer; }
 .credit-tl { font-size: 0.62rem; letter-spacing: 0.08em; color: var(--gold); opacity: 0.75; order: -1; }
 .help-btn { background: var(--gold); color: #06122c; border: 0; font-weight: 700;
   font-size: 0.72rem; padding: 0.32rem 0.7rem; border-radius: 999px; }
-
-/* ---- help / rules page ---- */
-.help { padding-bottom: 2rem; }
-.help h1 { font-size: 2rem; margin: 0.5rem 0 0.2rem; }
-.help .h2 { font-size: 1.15rem; margin: 1.4rem 0 0.4rem; }
-.help p { line-height: 1.55; }
-.help ul { line-height: 1.65; padding-left: 1.1rem; }
-.help b { color: var(--text); }
-.back { background: transparent; border: 1px solid var(--line); color: var(--text);
-  padding: 0.45rem 0.8rem; border-radius: 9px; font-weight: 600; margin: 0.2rem 0 0.6rem; }
-.rules { width: 100%; border-collapse: collapse; background: var(--panel);
-  border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin: 0.5rem 0; backdrop-filter: blur(3px); }
-.rules td { padding: 0.6rem 1rem; border-top: 1px solid var(--line); }
-.rules tr:first-child td { border-top: 0; }
-.rules td:last-child { text-align: right; font-weight: 800; color: var(--gold); }
 .topbar { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.2rem 1rem; }
 .brand { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; }
 .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%;
@@ -124,9 +108,11 @@ button { font-family: var(--font-body); cursor: pointer; }
 .ghost { background: transparent; border: 1px solid var(--line); color: var(--text);
   padding: 0.45rem 0.8rem; border-radius: 9px; font-weight: 600; }
 
-.maintabs { display: flex; gap: 0.5rem; margin-bottom: 1.3rem; }
-.maintabs button { flex: 1; background: var(--panel); border: 1px solid var(--line);
-  color: var(--muted); padding: 0.7rem; border-radius: 12px; font-weight: 700; }
+/* tabs wrap onto a second line on narrow screens so none get cut off */
+.maintabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.3rem; }
+.maintabs button { flex: 1 1 auto; white-space: nowrap; background: var(--panel);
+  border: 1px solid var(--line); color: var(--muted); padding: 0.7rem 0.9rem;
+  border-radius: 12px; font-weight: 700; font-size: 0.9rem; }
 .maintabs button.on { background: var(--blue); color: #fff; border-color: transparent; }
 
 /* ---- rounds + fixtures ---- */
@@ -155,6 +141,7 @@ button { font-family: var(--font-body); cursor: pointer; }
   padding: 0.2rem 0.5rem; border-radius: 999px; }
 .chip.good { color: #06231a; background: var(--green); }
 .chip.bad { color: #fff; background: var(--red); }
+.chip.pending { color: var(--text); background: rgba(150, 180, 240, 0.18); }
 
 /* ---- leaderboard ---- */
 .board { width: 100%; border-collapse: collapse; background: var(--panel);
@@ -167,6 +154,21 @@ button { font-family: var(--font-body); cursor: pointer; }
 .board th:last-child { text-align: right; }
 .board tr.me { background: rgba(31, 95, 224, 0.18); }
 .board tr:first-child .rank { color: var(--gold); }
+
+/* ---- help / rules page ---- */
+.help { padding-bottom: 2rem; }
+.help h1 { font-size: 2rem; margin: 0.5rem 0 0.2rem; }
+.help .h2 { font-size: 1.15rem; margin: 1.4rem 0 0.4rem; }
+.help p { line-height: 1.55; }
+.help ul { line-height: 1.65; padding-left: 1.1rem; }
+.help b { color: var(--text); }
+.back { background: transparent; border: 1px solid var(--line); color: var(--text);
+  padding: 0.45rem 0.8rem; border-radius: 9px; font-weight: 600; margin: 0.2rem 0 0.6rem; }
+.rules { width: 100%; border-collapse: collapse; background: var(--panel);
+  border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin: 0.5rem 0; backdrop-filter: blur(3px); }
+.rules td { padding: 0.6rem 1rem; border-top: 1px solid var(--line); }
+.rules tr:first-child td { border-top: 0; }
+.rules td:last-child { text-align: right; font-weight: 800; color: var(--gold); }
 
 /* ---- misc ---- */
 .toast { position: fixed; bottom: 1.2rem; left: 50%; transform: translateX(-50%);
