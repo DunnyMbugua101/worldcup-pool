@@ -268,9 +268,11 @@ function Predict({ session }) {
           <h2 className="display">{current.name}</h2>
           <span className="lock is-open">Locks {fmtDate(current.lock_at)}</span>
         </header>
-        <p className="muted small">
-           No more second chances. One game, one call, one shot at glory.
-           Pick your moment, trust your gut, and back it.
+        <p style={{
+          background: "var(--panel-2)", border: "1px solid var(--gold)", borderRadius: "12px",
+          padding: "0.8rem 1rem", margin: "0 0 1rem", lineHeight: 1.5, fontWeight: 600,
+        }}>
+          No more second chances. One game, one call, one shot at glory. Pick your moment, trust your gut, and back it🏆.
         </p>
         {fxs.map((fx) => (
           <FixtureRow key={fx.id} fx={fx} locked={false} pick={picks[fx.id]} onPick={savePick} />
@@ -455,7 +457,7 @@ function Help({ onBack }) {
         <tr><td>Semi-finals</td><td>8 pts</td></tr>
         <tr><td>Final</td><td>10 pts</td></tr>
       </tbody></table>
-      <p className="muted small">The third-place play-off isn't scored.</p>
+      <p className="muted small">The third-place play-off was scored for 9 bonus points.</p>
 
       <h2 className="display h2">The penalty</h2>
       <p>Miss a whole round — no picks at all before it locks — and you lose
@@ -468,6 +470,158 @@ function Help({ onBack }) {
       matches finish.</p>
 
       <button className="back" onClick={onBack}>← Back to predictions</button>
+    </div>
+  );
+}
+
+// --------------------------------------------------------------- Winners
+function Fireworks() {
+  const ref = React.useRef(null);
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let w = canvas.width = canvas.offsetWidth;
+    let h = canvas.height = canvas.offsetHeight;
+    const onResize = () => { w = canvas.width = canvas.offsetWidth; h = canvas.height = canvas.offsetHeight; };
+    window.addEventListener("resize", onResize);
+    let parts = [];
+    const colors = ["#e7b53e", "#ffd35a", "#ffffff", "#1f5fe0", "#2fae5b"];
+    function burst() {
+      const x = Math.random() * w;
+      const y = Math.random() * h * 0.5 + h * 0.1;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const n = 38;
+      for (let i = 0; i < n; i++) {
+        const a = (Math.PI * 2 * i) / n;
+        const speed = 2 + Math.random() * 3;
+        parts.push({ x, y, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, life: 1, color });
+      }
+    }
+    let raf, t = 0;
+    function frame() {
+      ctx.clearRect(0, 0, w, h);
+      if (t++ % 38 === 0) burst();
+      parts.forEach((p) => {
+        p.x += p.vx; p.y += p.vy; p.vy += 0.04; p.life -= 0.012;
+        ctx.globalAlpha = Math.max(p.life, 0);
+        ctx.fillStyle = p.color;
+        ctx.beginPath(); ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2); ctx.fill();
+      });
+      parts = parts.filter((p) => p.life > 0);
+      raf = requestAnimationFrame(frame);
+    }
+    frame();
+    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", onResize); };
+  }, []);
+  return <canvas ref={ref} className="fw-canvas" />;
+}
+
+function BouncyName({ text }) {
+  return (
+    <span className="bouncy">
+      {[...text].map((ch, i) => (
+        <span key={i} style={{ animationDelay: `${i * 0.06}s` }}>{ch === " " ? "\u00A0" : ch}</span>
+      ))}
+    </span>
+  );
+}
+
+function Winners() {
+  const [rows, setRows] = useState(null);
+  const [finalDone, setFinalDone] = useState(null);
+  useEffect(() => {
+    (async () => {
+      const [{ data: champ }, { data: fin }] = await Promise.all([
+        supabase.rpc("get_champion_picks"),
+        supabase.from("fixtures").select("finished").eq("stage", "FINAL").eq("finished", true).limit(1),
+      ]);
+      setRows(champ ?? []);
+      setFinalDone((fin ?? []).length > 0);
+    })();
+  }, []);
+
+  if (rows === null || finalDone === null) return <p className="muted center">Loading…</p>;
+
+  // Locked until the final has been played — dedicated wall of fame.
+  if (!finalDone) {
+    return (
+      <div className="winners">
+        <div className="fame-wait">
+          <div className="fame-trophy">🏆</div>
+          <div className="winner-label">WALL OF FAME</div>
+          <h1 className="display">Awaiting a champion</h1>
+          <p className="muted">The winner will be crowned right here once the final has been
+          played. Until then it's all still to play for — Make your final pick!.</p>
+        </div>
+        <style>{`
+          .fame-wait { text-align:center; padding:3rem 1.5rem; border:1px solid var(--line);
+            border-radius:18px; background:var(--panel); backdrop-filter:blur(3px); }
+          .fame-trophy { font-size:3.4rem; filter:grayscale(0.4); opacity:0.85; margin-bottom:0.4rem; }
+          .fame-wait h1 { font-size:1.8rem; margin:0.3rem 0 0.6rem; }
+          .winner-label { color:var(--muted); letter-spacing:0.22em; font-size:0.72rem; }
+        `}</style>
+      </div>
+    );
+  }
+
+  const topPoints = rows.length ? Math.max(...rows.map((r) => Number(r.points))) : 0;
+  if (!rows.length || topPoints <= 0)
+    return <p className="muted center">🏆 The final's done, but there are no scores to crown yet.</p>;
+
+  const byName = {};
+  rows.forEach((r) => { (byName[r.display_name] ??= []).push(r); });
+  const names = Object.keys(byName);
+  const pickText = (r) => r.pick === "DRAW" ? "Draw" : r.pick === "HOME_TEAM" ? r.home_team : r.away_team;
+
+  return (
+    <div className="winners">
+      <style>{`
+        @keyframes bounceLetter { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+        .bouncy { display:inline-flex; flex-wrap:wrap; justify-content:center; }
+        .bouncy span { display:inline-block; color:var(--gold); font-family:var(--font-display);
+          font-weight:800; font-size:clamp(2rem,10vw,3.4rem); line-height:1.1;
+          animation:bounceLetter 1s ease-in-out infinite; text-shadow:0 0 18px rgba(231,181,62,0.5); }
+        .fw-canvas { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+        .winner-hero { position:relative; text-align:center; padding:1.4rem 0 1rem; overflow:hidden; min-height:190px; }
+        .winner-crown { font-size:2.4rem; position:relative; }
+        .winner-label { color:var(--gold); letter-spacing:0.22em; font-size:0.72rem; margin-bottom:0.4rem; position:relative; }
+      `}</style>
+
+      <div className="winner-hero">
+        <Fireworks />
+        <div className="winner-crown">👑</div>
+        <div className="winner-label">{names.length > 1 ? "JOINT WINNERS" : "WINNER"}</div>
+        {names.map((n) => <div key={n}><BouncyName text={cleanName(n)} /></div>)}
+        <div className="muted" style={{ marginTop: "0.6rem", position: "relative" }}>{topPoints} points</div>
+      </div>
+
+      {names.map((n) => (
+        <div key={n}>
+          <h2 className="display h2" style={{ marginTop: "1.4rem" }}>{cleanName(n)}'s picks</h2>
+          {byName[n].slice().sort((a, b) => new Date(b.kickoff_at) - new Date(a.kickoff_at)).map((r, i) => {
+            const finished = r.finished;
+            const correct = finished && r.pick === r.result;
+            return (
+              <div className="fixture done" key={i}>
+                <div className="when">{fmtDate(r.kickoff_at)}</div>
+                <div className="teams">
+                  <span className="team">{r.home_team}</span>
+                  <span className="vs">v</span>
+                  <span className="team away">{r.away_team}</span>
+                </div>
+                <div className="small">
+                  <span className="muted">Picked: </span><b>{pickText(r)}</b>
+                  {finished
+                    ? (correct ? <span className="chip good" style={{ marginLeft: 8 }}>✓</span>
+                               : <span className="chip bad" style={{ marginLeft: 8 }}>✗</span>)
+                    : <span className="chip pending" style={{ marginLeft: 8 }}>Not played yet</span>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ))}
     </div>
   );
 }
@@ -530,6 +684,7 @@ export default function App() {
           <button className={tab === "history" ? "on" : ""} onClick={() => setTab("history")}>History</button>
           <button className={tab === "results" ? "on" : ""} onClick={() => setTab("results")}>Results</button>
           <button className={tab === "board" ? "on" : ""} onClick={() => setTab("board")}>Leaderboard</button>
+          <button className={tab === "winners" ? "on" : ""} onClick={() => setTab("winners")}>Winner</button>
         </nav>
 
         <main className="content">
@@ -537,6 +692,7 @@ export default function App() {
           {tab === "history" && <History />}
           {tab === "results" && <Results />}
           {tab === "board" && <Leaderboard meName={name} />}
+          {tab === "winners" && <Winners />}
           {tab === "help" && <Help onBack={() => setTab("predict")} />}
         </main>
       </div>
